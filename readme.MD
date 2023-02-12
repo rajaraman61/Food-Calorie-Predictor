@@ -1,2 +1,2 @@
-# Food-Calorie-Predictor
+# Food Calorie Predictor
  
