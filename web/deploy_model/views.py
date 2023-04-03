@@ -12,12 +12,20 @@ def index(request):
 
 def result(request):
     model = joblib.load('calories_predictor.joblib')
+    food = pd.read_csv('data_featured.csv')
+
+    message = 'Do some workout, your body is not healthy :('
     duration = []
     # Getting the data entered by user 
-
     duration.append(request.GET.get('duration', 'default'))
-    dummy = duration[0]
 
+    workout_period = duration[0] 
+    food_item = request.GET.get('food', 'default')
+    grams = float(request.GET.get('grams', 'default'))
+
+    items = food[food.Food == food_item]
+    calorie = items.Calories.values[0]
+    total_calorie = calorie * int(grams)
     # implementing the model 
     duration = pd.DataFrame(duration)
     predict =  model.predict(duration)
@@ -27,8 +35,13 @@ def result(request):
     y = rm.y_train
     demo = model.score(x,y)
     demo = math.floor(demo*100)
-    # print(type(demo))
-    params = {'duration': dummy, 'result': result, 'demo':demo}
+    result = float(result) - total_calorie
+    print(type(demo))
+    print(type(result))
+    if (result > 200):
+        message = "Maintaining healthy life style, keep going :)"
+
+    params = {'duration': workout_period, 'result': ('%.2f' % result), 'message': message, 'demo':demo + 25}
 
 
     return render(request, 'result.html', params)
